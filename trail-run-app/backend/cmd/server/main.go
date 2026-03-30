@@ -5,21 +5,46 @@ import (
 	"net/http"
 	"os"
 
+	"trail-run-app/internal/handler"
+	"trail-run-app/internal/model"
+	"trail-run-app/pkg/middleware"
+	"trail-run-app/pkg/redis"
+	"trail-run-app/pkg/utils"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// TODO: Load configuration from environment variables
-	// TODO: Initialize database connection (GORM)
-	// TODO: Initialize Redis connection
-	// TODO: Setup JWT middleware
-	// TODO: Register routes
+	// Initialize logger
+	utils.InitLogger()
+	utils.LogInfo("Starting Trail Run App server...")
 
+	// Initialize JWT
+	middleware.InitJWT()
+
+	// Initialize database
+	if err := model.InitDB(); err != nil {
+		utils.LogError("Failed to initialize database: %v", err)
+		os.Exit(1)
+	}
+
+	// Auto migrate database schema
+	if err := model.AutoMigrate(); err != nil {
+		utils.LogError("Failed to migrate database: %v", err)
+		os.Exit(1)
+	}
+
+	// Initialize Redis
+	if err := redis.InitRedis(); err != nil {
+		utils.LogWarn("Warning: Redis connection failed: %v (continuing without Redis)", err)
+	}
+
+	// Setup Gin router
 	r := gin.Default()
 
 	// Health check
 	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+		utils.RespondSuccess(c, gin.H{"status": "ok"})
 	})
 
 	// API v1 routes
@@ -28,96 +53,41 @@ func main() {
 		// Auth routes (public)
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/register", registerHandler)
-			auth.POST("/login", loginHandler)
+			auth.POST("/register", handler.Register)
+			auth.POST("/login", handler.Login)
 		}
 
 		// Protected routes
 		protected := v1.Group("")
-		protected.Use(authMiddleware())
+		protected.Use(middleware.AuthRequired())
 		{
 			// User routes
-			protected.GET("/users/me", getCurrentUserHandler)
+			protected.GET("/users/me", handler.GetCurrentUser)
 
 			// Race routes
-			protected.GET("/races", listRacesHandler)
-			protected.GET("/races/:id", getRaceHandler)
-			protected.GET("/races/:id/plan", getRacePlanHandler)
-			protected.GET("/races/:id/equipment", getEquipmentHandler)
-			protected.POST("/races/:id/equipment/check", checkEquipmentHandler)
+			protected.GET("/races", handler.ListRaces)
+			protected.GET("/races/:id", handler.GetRace)
+			protected.GET("/races/:id/plan", handler.GetRacePlan)
+			protected.GET("/races/:id/equipment", handler.GetEquipment)
+			protected.POST("/races/:id/equipment/check", handler.CheckEquipment)
 
 			// Results routes
-			protected.GET("/results", listResultsHandler)
-			protected.POST("/results", createResultHandler)
-			protected.GET("/results/:id", getResultHandler)
-			protected.POST("/results/:id/image", generateImageHandler)
+			protected.GET("/results", handler.ListResults)
+			protected.POST("/results", handler.CreateResult)
+			protected.GET("/results/:id", handler.GetResult)
+			protected.POST("/results/:id/image", handler.GenerateImage)
 		}
 	}
 
+	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	log.Printf("Server starting on :%s", port)
+	utils.LogInfo("Server starting on :%s", port)
 	if err := r.Run(":" + port); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		utils.LogError("Failed to start server: %v", err)
+		os.Exit(1)
 	}
-}
-
-// Placeholder handlers - to be implemented
-
-func authMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// TODO: Implement JWT validation
-		c.Next()
-	}
-}
-
-func registerHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func loginHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func getCurrentUserHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func listRacesHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func getRaceHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func getRacePlanHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func getEquipmentHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func checkEquipmentHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func listResultsHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func createResultHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func getResultHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
-}
-
-func generateImageHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
