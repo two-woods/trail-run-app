@@ -1,0 +1,40 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "越野跑"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/race-list/race-list",
+      "style": {
+        "navigationBarTitleText": "赛事"
+      }
+    },
+    {
+      "path": "pages/race-detail/race-detail",
+      "style": {
+        "navigationBarTitleText": "赛事详情"
+      }
+    },
+    {
+      "path": "pages/my-races/my-races",
+      "style": {
+        "navigationBarTitleText": "我的比赛"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "越野跑",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  }
+}

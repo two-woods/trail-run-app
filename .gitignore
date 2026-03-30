@@ -1,0 +1,51 @@
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# Editor
+.vscode/
+.idea/
+*.sublime-*
+
+# Go
+*.exe
+*.exe~
+*.test
+*.out
+vendor/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Uni-app / Node
+node_modules/
+dist/
+build/
+*.log
+.env
+.env.*
+
+# Uni-app specific
+unpackage/
+*.pfx
+*.p12
+*.key
+
+# Misc
+*.png
+*.jpg
+!tests/**/*
+
+# Local configs (do not commit)
+*.local
+docker-compose.override.yml

@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trail-run-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=trail_run_password
+      - DB_NAME=trail_run
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=change_me_in_production
+      - IMAGE_SERVICE_URL=http://python-image-service:5000
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      python-image-service:
+        condition: service_started
+    networks:
+      - trail-run-network
+
+  python-image-service:
+    build:
+      context: ./image-service
+      dockerfile: Dockerfile
+    container_name: trail-run-image-service
+    ports:
+      - "5000:5000"
+    networks:
+      - trail-run-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: trail-run-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: trail_run_password
+      MYSQL_DATABASE: trail_run
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trail-run-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: trail-run-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - trail-run-network
+
+networks:
+  trail-run-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
