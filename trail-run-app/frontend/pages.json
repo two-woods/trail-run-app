@@ -9,7 +9,8 @@
     {
       "path": "pages/login/login",
       "style": {
-        "navigationBarTitleText": "登录"
+        "navigationBarTitleText": "登录",
+        "navigationStyle": "custom"
       }
     },
     {
@@ -36,5 +37,31 @@
     "navigationBarTitleText": "越野跑",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#667eea",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tab-home.png",
+        "selectedIconPath": "static/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/race-list/race-list",
+        "text": "赛事",
+        "iconPath": "static/tab-race.png",
+        "selectedIconPath": "static/tab-race-active.png"
+      },
+      {
+        "pagePath": "pages/my-races/my-races",
+        "text": "我的",
+        "iconPath": "static/tab-user.png",
+        "selectedIconPath": "static/tab-user-active.png"
+      }
+    ]
   }
 }

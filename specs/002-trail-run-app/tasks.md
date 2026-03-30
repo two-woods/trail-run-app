@@ -9,12 +9,12 @@
 
 **Purpose**: 项目脚手架和基础设施搭建
 
-- [ ] T001 [P] 创建项目目录结构（backend/, image-service/, frontend/, docs/）
-- [ ] T002 [P] 初始化 Go(Gin) 后端项目，配置 go.mod 依赖
-- [ ] T003 [P] 初始化 Python FastAPI 图片服务项目
-- [ ] T004 [P] 初始化 Uni-app 前端项目
-- [ ] T005 配置 Docker Compose 本地开发环境（MySQL + Redis + 服务）
-- [ ] T006 配置环境变量管理（.env 示例文件）
+- [x] T001 [P] 创建项目目录结构（backend/, image-service/, frontend/, docs/）
+- [x] T002 [P] 初始化 Go(Gin) 后端项目，配置 go.mod 依赖
+- [x] T003 [P] 初始化 Python FastAPI 图片服务项目
+- [x] T004 [P] 初始化 Uni-app 前端项目
+- [x] T005 配置 Docker Compose 本地开发环境（MySQL + Redis + 服务）
+- [x] T006 配置环境变量管理（.env 示例文件）
 
 ---
 
@@ -24,12 +24,12 @@
 
 **⚠️ CRITICAL**: 用户故事实现前必须完成此阶段
 
-- [ ] T007 初始化 MySQL 数据库和表结构（users, races, aid_stations, equipment, results, equipment_checks, favorite_races）
-- [ ] T008 [P] 实现 Go JWT 认证中间件
-- [ ] T009 [P] 配置 Gin 路由结构（api/v1/* 分组）
-- [ ] T010 创建 User/Race/AidStation/Equipment/Result 基础 Model（Go + GORM）
-- [ ] T011 实现统一错误处理和日志基础设施
-- [ ] T012 配置 Redis 连接和会话管理
+- [x] T007 初始化 MySQL 数据库和表结构（users, races, aid_stations, equipment, results, equipment_checks, favorite_races）
+- [x] T008 [P] 实现 Go JWT 认证中间件
+- [x] T009 [P] 配置 Gin 路由结构（api/v1/* 分组）
+- [x] T010 创建 User/Race/AidStation/Equipment/Result 基础 Model（Go + GORM）
+- [x] T011 实现统一错误处理和日志基础设施
+- [x] T012 配置 Redis 连接和会话管理
 
 **Checkpoint**: 基础就绪，用户故事可并行开始
 
@@ -39,10 +39,10 @@
 
 **Goal**: 用户注册、登录、个人信息管理
 
-- [ ] T013 [P] POST /api/v1/auth/register 注册接口
-- [ ] T014 [P] POST /api/v1/auth/login 登录接口
-- [ ] T015 GET /api/v1/users/me 获取当前用户信息
-- [ ] T016 Uni-app 端：实现登录/注册页面和 token 存储
+- [x] T013 [P] POST /api/v1/auth/register 注册接口
+- [x] T014 [P] POST /api/v1/auth/login 登录接口
+- [x] T015 GET /api/v1/users/me 获取当前用户信息
+- [x] T016 Uni-app 端：实现登录/注册页面和 token 存储
 
 ---
 
