@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/google/uuid"
 
 	"trail-run-app/internal/model"
+	"trail-run-app/pkg/amap"
 	"trail-run-app/pkg/utils"
 )
 
@@ -144,13 +146,28 @@ func GetRacePlan(c *gin.Context) {
 	plan.Commute.StartPoint.Lng = race.StartLng
 	plan.Commute.StartPoint.Name = "起点"
 
-	// TODO: Get parking info from Amap API
-	plan.Commute.Parking = []struct {
-		Name      string  `json:"name"`
-		DistanceM int     `json:"distance_m"`
-		Lat       float64 `json:"lat"`
-		Lng       float64 `json:"lng"`
-	}{}
+	// Get parking info from Amap API
+	amapClient := amap.NewClient()
+	pois, err := amapClient.GetNearbyPOIs(race.StartLat, race.StartLng, "停车场")
+	if err == nil && len(pois) > 0 {
+		for _, poi := range pois {
+			var lat, lng float64
+			fmt.Sscanf(poi.Location, "%f,%f", &lng, &lat)
+			var dist int
+			fmt.Sscanf(poi.Distance, "%d", &dist)
+			plan.Commute.Parking = append(plan.Commute.Parking, struct {
+				Name      string  `json:"name"`
+				DistanceM int     `json:"distance_m"`
+				Lat       float64 `json:"lat"`
+				Lng       float64 `json:"lng"`
+			}{
+				Name:      poi.Name,
+				DistanceM: dist,
+				Lat:       lat,
+				Lng:       lng,
+			})
+		}
+	}
 
 	// Convert aid stations
 	aidStations := make([]*model.AidStationResponse, len(race.AidStations))
@@ -159,8 +176,21 @@ func GetRacePlan(c *gin.Context) {
 	}
 	plan.AidStations = aidStations
 
-	// TODO: Get weather from Amap API
-	plan.Weather = nil
+	// Get weather from Amap API
+	if race.WeatherCityCode != nil && *race.WeatherCityCode != "" {
+		weather, err := amapClient.GetWeather(*race.WeatherCityCode)
+		if err == nil {
+			var temp float64
+			fmt.Sscanf(weather.Temperature, "%f", &temp)
+			plan.Weather = map[string]interface{}{
+				"date":        time.Now().Format("2006-01-02"),
+				"weather":     weather.Weather,
+				"temperature": weather.Temperature,
+				"wind":        weather.WindDirection + weather.WindPower,
+				"humidity":    weather.Humidity + "%",
+			}
+		}
+	}
 
 	utils.RespondSuccess(c, plan)
 }

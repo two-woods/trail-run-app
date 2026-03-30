@@ -66,23 +66,23 @@
 **依赖**: Phase 4 完成
 
 ### 装备清单
-- [ ] T021 GET /api/v1/races/:id/equipment 获取装备清单
-- [ ] T022 POST /api/v1/races/:id/equipment/check 更新装备勾选状态
-- [ ] T023 实现装备查漏补缺逻辑（基于距离/天气/爬升）
-- [ ] T024 Uni-app 端：装备清单页面（分类展示、勾选交互）
+- [x] T021 GET /api/v1/races/:id/equipment 获取装备清单
+- [x] T022 POST /api/v1/races/:id/equipment/check 更新装备勾选状态
+- [x] T023 实现装备查漏补缺逻辑（基于距离/天气/爬升）
+- [x] T024 Uni-app 端：装备清单页面（分类展示、勾选交互）
 
 ### 通勤方式
-- [ ] T025 [P] 高德地图API对接（地理编码、POI搜索）
-- [ ] T026 实现起点导航、停车场指引接口
-- [ ] T027 Uni-app 端：一键跳转高德导航
+- [x] T025 [P] 高德地图API对接（地理编码、POI搜索）
+- [x] T026 实现起点导航、停车场指引接口
+- [x] T027 Uni-app 端：一键跳转高德导航
 
 ### 补给站信息
-- [ ] T028 [P] 补给站标记点渲染（markers + callout）
-- [ ] T029 Uni-app 端：补给站列表和地图标记
+- [x] T028 [P] 补给站标记点渲染（markers + callout）
+- [x] T029 Uni-app 端：补给站列表和地图标记
 
 ### 天气预报
-- [ ] T030 [P] 高德天气API对接
-- [ ] T031 Uni-app 端：天气预报展示组件
+- [x] T030 [P] 高德天气API对接
+- [x] T031 Uni-app 端：天气预报展示组件
 
 ---
 
