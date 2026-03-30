@@ -7,7 +7,7 @@
 
 为越野跑爱好者开发一款多端App（iOS/Android/小程序），核心功能包括赛程当日规划（装备清单、通勤、补给站、天气）和完赛记录管理（轨迹展示+可分享图片）。
 
-技术方案：Uni-app (Vue) 前端 + Go后端 + Python图片生成服务 + MySQL + Redis + 高德地图
+技术方案：Uni-app (Vue) 前端 + Go(Gin)后端 + Python图片生成服务 + MySQL + Redis + 高德地图
 
 ## Technical Context
 
@@ -17,7 +17,7 @@
 - 图片服务: Python 3.11+
 
 **Primary Dependencies**:
-- 后端: Gorilla Mux, GORM, go-redis, go-oss-sdk
+- 后端: Gin, GORM, go-redis, go-oss-sdk
 - 前端: uni-app, 高德地图小程序SDK
 - 图片: Pillow, Matplotlib, cairosvg
 
@@ -100,104 +100,28 @@ trail-run-app/
 
 | Item | Status | Notes |
 |------|--------|-------|
-| 高德地图小程序SDK对接方式 | NEEDS CLARIFICATION | key申请、数据格式、API限制 |
-| Python图片服务部署方式 | NEEDS CLARIFICATION | 独立服务 vs sidecar vs 内联 |
-| GPX轨迹解析方案 | NEEDS CLARIFICATION | Go库选择或自解析 |
-| 天气API数据源 | NEEDS CLARIFICATION | 高德天气 vs 第三方 |
-| 离线缓存策略 | NEEDS CLARIFICATION | Uni-app Storage方案 |
+| 高德地图小程序SDK对接方式 | ✅ RESOLVED | 见research.md |
+| Python图片服务部署方式 | ✅ RESOLVED | 独立Docker容器，HTTP通信 |
+| GPX轨迹解析方案 | ✅ RESOLVED | gpxgo库 |
+| 天气API数据源 | ✅ RESOLVED | 高德天气API |
+| 离线缓存策略 | ✅ RESOLVED | Uni Storage分层缓存 |
 
-### Research Tasks
-
-1. **Uni-app + Go后端集成模式** — REST API设计规范
-2. **高德地图小程序SDK** — 使用方法和对接细节
-3. **Go + Python微服务通信** — gRPC vs HTTP
-4. **GPX轨迹解析** — Go库或自解析方案
-5. **天气API对接** — 高德天气API vs OpenWeatherMap
+All NEEDS CLARIFICATION items resolved in research.md.
 
 ## Phase 1: Design & Contracts
 
-### Data Model (from spec.md entities)
+### Data Model
 
-```
-User
-├── id (uuid)
-├── nickname
-├── avatar_url
-├──itra_account (optional)
-└── privacy_settings
-
-Race
-├── id (uuid)
-├── name
-├── date
-├── location
-├── distance_km
-├── elevation_m
-├── difficulty
-├──itra_points
-├── route_gpx_url
-└── status (draft/published)
-
-AidStation
-├── id (uuid)
-├── race_id (fk)
-├── name
-├── distance_km
-├── elevation_m
-├── supplies[]
-└── close_time
-
-Equipment
-├── id (uuid)
-├── race_id (fk)
-├── name
-├── is_mandatory
-└── category
-
-Result
-├── id (uuid)
-├── user_id (fk)
-├── race_id (fk)
-├── finish_time
-├── ranking
-├── ranking_age_group
-├── gpx_url
-├── photos[]
-├── generated_image_url
-└── created_at
-
-EquipmentCheck
-├── id (uuid)
-├── user_id (fk)
-├── race_id (fk)
-├── equipment_id (fk)
-└── checked (bool)
-```
+详见 `data-model.md`:
+- User, Race, AidStation, Equipment, Result, EquipmentCheck, FavoriteRace
+- 关系: User 1:N Result, Race 1:N AidStation, etc.
 
 ### Interface Contracts
 
-**REST API Endpoints (MVP)**:
-
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | /api/v1/auth/register | 用户注册 |
-| POST | /api/v1/auth/login | 用户登录 |
-| GET | /api/v1/users/me | 当前用户信息 |
-| GET | /api/v1/races | 赛事列表 |
-| GET | /api/v1/races/:id | 赛事详情 |
-| GET | /api/v1/races/:id/plan | 当日规划数据 |
-| GET | /api/v1/races/:id/equipment | 装备清单 |
-| POST | /api/v1/races/:id/equipment/check | 更新装备勾选 |
-| GET | /api/v1/results | 我的比赛列表 |
-| POST | /api/v1/results | 创建完赛记录 |
-| GET | /api/v1/results/:id | 完赛记录详情 |
-| POST | /api/v1/results/:id/image | 生成轨迹图片 |
-
-**Python Image Service**:
-- POST /generate — 接收GPX数据+参数，返回生成的图片URL
-- Input: {race_name, date, gpx_data, stats}
-- Output: {image_url}
+详见 `contracts/README.md`:
+- REST API: /api/v1/*
+- Python Image Service: POST /generate
 
 ---
 
-**Phase 1 artifacts**: research.md, data-model.md, contracts/, quickstart.md 待生成
+**Phase 1 artifacts**: research.md ✅, data-model.md ✅, contracts/ ✅, quickstart.md ✅
