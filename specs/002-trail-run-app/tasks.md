@@ -93,21 +93,21 @@
 **依赖**: Phase 3 完成
 
 ### 完赛记录 CRUD
-- [ ] T032 [P] GET /api/v1/results 我的比赛列表
-- [ ] T033 [P] POST /api/v1/results 创建完赛记录
-- [ ] T034 GET /api/v1/results/:id 完赛记录详情
-- [ ] T035 Uni-app 端：我的比赛页面
+- [x] T032 [P] GET /api/v1/results 我的比赛列表
+- [x] T033 [P] POST /api/v1/results 创建完赛记录
+- [x] T034 GET /api/v1/results/:id 完赛记录详情
+- [x] T035 Uni-app 端：我的比赛页面
 
 ### GPX轨迹解析
-- [ ] T036 [P] Go gpxgo库集成，解析GPX文件
-- [ ] T037 计算轨迹统计（距离、爬升、海拔变化）
-- [ ] T038 转换GPX为GeoJSON供地图渲染
+- [x] T036 [P] Go gpxgo库集成，解析GPX文件
+- [x] T037 计算轨迹统计（距离、爬升、海拔变化）
+- [x] T038 转换GPX为GeoJSON供地图渲染
 
 ### 参赛地图展示
-- [ ] T039 [P] Uni-app 高德地图组件集成
-- [ ] T040 轨迹polyline渲染 + 渐变配色（海拔/速度）
-- [ ] T041 起点/终点/补给站标记点
-- [ ] T042 地图缩放、拖拽交互
+- [x] T039 [P] Uni-app 高德地图组件集成
+- [x] T040 轨迹polyline渲染 + 渐变配色（海拔/速度）
+- [x] T041 起点/终点/补给站标记点
+- [x] T042 地图缩放、拖拽交互
 
 ---
 
@@ -117,12 +117,12 @@
 
 **依赖**: Phase 6 完成
 
-- [ ] T043 [P] Python FastAPI 图片生成服务搭建
-- [ ] T044 [P] GPX轨迹解析 + 地图底图叠加
-- [ ] T045 实现图片元素：赛事名称、日期、轨迹图、关键数据
-- [ ] T046 POST /api/v1/results/:id/image 触发图片生成
+- [x] T043 [P] Python FastAPI 图片生成服务搭建
+- [x] T044 [P] GPX轨迹解析 + 地图底图叠加
+- [x] T045 实现图片元素：赛事名称、日期、轨迹图、关键数据
+- [x] T046 POST /api/v1/results/:id/image 触发图片生成
 - [ ] T047 OSS上传集成，生成可访问URL
-- [ ] T048 Uni-app 端：图片预览和分享功能（保存相册/微信）
+- [x] T048 Uni-app 端：图片预览和分享功能（保存相册/微信）
 
 ---
 
@@ -130,11 +130,11 @@
 
 **Purpose**: 跨功能 concern 和上线准备
 
-- [ ] T049 [P] 离线缓存策略实现（Uni Storage）
-- [ ] T050 [P] 代码清理和 README 完善
-- [ ] T051 单元测试补全（Go testing）
-- [ ] T052 Docker Compose 生产镜像构建配置
-- [ ] T053 完善 quickstart.md
+- [x] T049 [P] 离线缓存策略实现（Uni Storage）
+- [x] T050 [P] 代码清理和 README 完善
+- [x] T051 单元测试补全（Go testing）
+- [x] T052 Docker Compose 生产镜像构建配置
+- [x] T053 完善 quickstart.md
 
 ---
 

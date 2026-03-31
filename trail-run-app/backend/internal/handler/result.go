@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/google/uuid"
 
 	"trail-run-app/internal/model"
+	"trail-run-app/internal/service"
 	"trail-run-app/pkg/utils"
 )
 
@@ -139,7 +141,7 @@ func GetResult(c *gin.Context) {
 
 	detail := model.ResultDetail{
 		ID:                result.ID,
-		Race:             result.Race,
+		Race:              result.Race,
 		FinishTime:        result.FinishTime,
 		Ranking:           result.Ranking,
 		RankingAgeGroup:   result.RankingAgeGroup,
@@ -149,7 +151,14 @@ func GetResult(c *gin.Context) {
 		CreatedAt:         result.CreatedAt,
 	}
 
-	// TODO: Parse GPX and generate GeoJSON if GPXURL exists
+	// Parse GPX and generate GeoJSON if GPXURL exists
+	if result.GPXURL != nil && *result.GPXURL != "" {
+		stats, geojson, err := service.ParseGPXFromURL(*result.GPXURL)
+		if err == nil {
+			detail.GeoJSON = geojson
+			detail.Stats = stats
+		}
+	}
 
 	utils.RespondSuccess(c, detail)
 }
@@ -185,12 +194,39 @@ func GenerateImage(c *gin.Context) {
 		return
 	}
 
-	// TODO: Call Python image service
-	// For now, return accepted status
+	// Call Python image service
+	imageServiceURL := "http://localhost:8082/generate"
 
-	utils.RespondAccepted(c, gin.H{
-		"status":    "processing",
-		"image_url": "",
+	payload := map[string]interface{}{
+		"race_name":   req.RaceName,
+		"date":        req.Date,
+		"gpx_data":    req.GPXData,
+		"distance_km": req.DistanceKM,
+		"elevation_m": req.ElevationM,
+		"finish_time": req.FinishTime,
+	}
+
+	jsonData, _ := json.Marshal(payload)
+	resp, err := http.Post(imageServiceURL, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil || resp.StatusCode != http.StatusOK {
+		utils.RespondInternalError(c, "Image service unavailable")
+		return
+	}
+	defer resp.Body.Close()
+
+	var imgResp struct {
+		ImageURL  string `json:"image_url"`
+		ImageData string `json:"image_data"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&imgResp); err != nil {
+		utils.RespondInternalError(c, "Failed to parse image response")
+		return
+	}
+
+	utils.RespondSuccess(c, gin.H{
+		"status":     "completed",
+		"image_url":  imgResp.ImageURL,
+		"image_data": imgResp.ImageData, // Base64 encoded image
 	})
 }
 

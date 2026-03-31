@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-	"net/http"
 	"os"
 
 	"trail-run-app/internal/handler"

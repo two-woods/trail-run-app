@@ -76,12 +76,13 @@ type ResultListItem struct {
 
 type ResultDetail struct {
 	ID                uuid.UUID    `json:"id"`
-	Race             *Race        `json:"race"`
+	Race              *Race        `json:"race"`
 	FinishTime        *string      `json:"finish_time,omitempty"`
 	Ranking           *int         `json:"ranking,omitempty"`
 	RankingAgeGroup   *int         `json:"ranking_age_group,omitempty"`
 	GPXURL            *string      `json:"gpx_url,omitempty"`
 	GeoJSON           interface{}  `json:"geojson,omitempty"`
+	Stats             interface{}  `json:"stats,omitempty"`
 	Photos            []string     `json:"photos"`
 	GeneratedImageURL *string      `json:"generated_image_url,omitempty"`
 	CreatedAt         time.Time    `json:"created_at"`

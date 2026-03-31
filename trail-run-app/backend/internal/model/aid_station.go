@@ -2,7 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

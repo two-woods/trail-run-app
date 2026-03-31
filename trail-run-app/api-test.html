@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>越野跑App - API测试</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { color: white; text-align: center; margin-bottom: 30px; font-size: 2.5em; }
+        .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        h2 { color: #333; margin-bottom: 16px; font-size: 1.3em; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
+        .api-item { margin-bottom: 16px; }
+        .api-name { font-weight: bold; color: #667eea; margin-bottom: 4px; }
+        .api-path { font-family: monospace; background: #f5f5f5; padding: 8px 12px; border-radius: 4px; margin-bottom: 8px; }
+        .result { background: #f8f8f8; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.9em; max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+        button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1em; margin-right: 8px; margin-top: 8px; }
+        button:hover { opacity: 0.9; transform: scale(1.02); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
+        .status-ok { background: #e8f5e9; color: #4caf50; }
+        .status-error { background: #ffebee; color: #f44336; }
+        input, select { padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; margin-right: 8px; }
+        input:focus, select:focus { border-color: #667eea; outline: none; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+        .info { background: #e3f2fd; padding: 16px; border-radius: 8px; color: #1565c0; margin-bottom: 20px; }
+        .endpoints-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏔️ 越野跑App</h1>
+
+        <div class="info">
+            <strong>服务状态:</strong> 后端运行中 | MySQL连接正常 | Redis连接正常
+        </div>
+
+        <div class="card">
+            <h2>🔐 用户认证</h2>
+            <div class="form-row">
+                <input type="email" id="email" placeholder="邮箱" value="test@trail.com">
+                <input type="password" id="password" placeholder="密码" value="test123">
+                <input type="text" id="nickname" placeholder="昵称" value="测试跑者">
+            </div>
+            <button onclick="register()">注册</button>
+            <button onclick="login()">登录</button>
+            <button onclick="getCurrentUser()">获取当前用户</button>
+            <div id="auth-result" class="result" style="margin-top:12px;">点击按钮测试API...</div>
+        </div>
+
+        <div class="card">
+            <h2>🏃 赛事管理</h2>
+            <button onclick="getRaces()">获取赛事列表</button>
+            <button onclick="getRaceDetail()">获取赛事详情</button>
+            <button onclick="getRacePlan()">获取当日规划</button>
+            <div id="races-result" class="result" style="margin-top:12px;">点击按钮测试API...</div>
+        </div>
+
+        <div class="card">
+            <h2>🎒 装备清单</h2>
+            <button onclick="getEquipment()">获取装备清单</button>
+            <button onclick="checkEquipment()">更新装备状态</button>
+            <div id="equipment-result" class="result" style="margin-top:12px;">点击按钮测试API...</div>
+        </div>
+
+        <div class="card">
+            <h2>🏅 完赛记录</h2>
+            <button onclick="getResults()">获取我的比赛</button>
+            <button onclick="createResult()">创建完赛记录</button>
+            <button onclick="getResultDetail()">获取比赛详情</button>
+            <div id="results-result" class="result" style="margin-top:12px;">点击按钮测试API...</div>
+        </div>
+
+        <div class="card">
+            <h2>📊 服务信息</h2>
+            <div id="server-info">
+                <button onclick="healthCheck()">健康检查</button>
+                <div id="health-result" class="result" style="margin-top:12px;">点击按钮测试...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8081';
+        let token = localStorage.getItem('token') || '';
+        let currentUserId = '';
+        let raceId = '';
+        let resultId = '';
+
+        async function request(method, path, body = null) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const options = { method, headers };
+            if (body) options.body = JSON.stringify(body);
+
+            try {
+                const res = await fetch(`${API_BASE}${path}`, options);
+                const data = await res.json();
+                return { ok: res.ok, status: res.status, data };
+            } catch (e) {
+                return { ok: false, error: e.message };
+            }
+        }
+
+        function showResult(id, result, isError = false) {
+            const el = document.getElementById(id);
+            if (isError || result.error) {
+                el.innerHTML = `<span class="status status-error">错误</span> ${result.error || JSON.stringify(result)}`;
+            } else {
+                el.innerHTML = `<span class="status status-ok">成功</span>\n${JSON.stringify(result.data || result, null, 2)}`;
+            }
+        }
+
+        // Auth
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const nickname = document.getElementById('nickname').value;
+            const result = await request('POST', '/api/v1/auth/register', { email, password, nickname });
+            if (result.ok && result.data.data.token) {
+                token = result.data.data.token;
+                currentUserId = result.data.data.user_id;
+                localStorage.setItem('token', token);
+            }
+            showResult('auth-result', result, !result.ok);
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const result = await request('POST', '/api/v1/auth/login', { email, password });
+            if (result.ok && result.data.data.token) {
+                token = result.data.data.token;
+                localStorage.setItem('token', token);
+            }
+            showResult('auth-result', result, !result.ok);
+        }
+
+        async function getCurrentUser() {
+            const result = await request('GET', '/api/v1/users/me');
+            showResult('auth-result', result, !result.ok);
+        }
+
+        // Races
+        async function getRaces() {
+            const result = await request('GET', '/api/v1/races');
+            if (result.ok && result.data.data.races?.[0]) {
+                raceId = result.data.data.races[0].id;
+            }
+            showResult('races-result', result, !result.ok);
+        }
+
+        async function getRaceDetail() {
+            if (!raceId) { alert('请先获取赛事列表'); return; }
+            const result = await request('GET', `/api/v1/races/${raceId}`);
+            showResult('races-result', result, !result.ok);
+        }
+
+        async function getRacePlan() {
+            if (!raceId) { alert('请先获取赛事列表'); return; }
+            const result = await request('GET', `/api/v1/races/${raceId}/plan`);
+            showResult('races-result', result, !result.ok);
+        }
+
+        // Equipment
+        async function getEquipment() {
+            if (!raceId) { alert('请先获取赛事列表'); return; }
+            const result = await request('GET', `/api/v1/races/${raceId}/equipment`);
+            showResult('equipment-result', result, !result.ok);
+        }
+
+        async function checkEquipment() {
+            if (!raceId) { alert('请先获取赛事列表'); return; }
+            const result = await request('POST', `/api/v1/races/${raceId}/equipment/check`, {
+                equipment_ids: []
+            });
+            showResult('equipment-result', result, !result.ok);
+        }
+
+        // Results
+        async function getResults() {
+            const result = await request('GET', '/api/v1/results');
+            if (result.ok && result.data.data.results?.[0]) {
+                resultId = result.data.data.results[0].id;
+            }
+            showResult('results-result', result, !result.ok);
+        }
+
+        async function createResult() {
+            if (!raceId) { alert('请先获取赛事列表'); return; }
+            const result = await request('POST', '/api/v1/results', {
+                race_id: raceId,
+                finish_time: '05:30:00',
+                ranking: 42
+            });
+            if (result.ok && result.data.data.id) {
+                resultId = result.data.data.id;
+            }
+            showResult('results-result', result, !result.ok);
+        }
+
+        async function getResultDetail() {
+            if (!resultId) { alert('请先创建或获取比赛记录'); return; }
+            const result = await request('GET', `/api/v1/results/${resultId}`);
+            showResult('results-result', result, !result.ok);
+        }
+
+        // Health
+        async function healthCheck() {
+            const result = await request('GET', '/health');
+            showResult('health-result', result, !result.ok);
+        }
+
+        // Auto health check on load
+        healthCheck();
+    </script>
+</body>
+</html>

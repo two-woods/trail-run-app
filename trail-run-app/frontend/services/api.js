@@ -32,6 +32,35 @@ const request = (options) => {
   })
 }
 
+// 带缓存的请求
+const cachedRequest = async (options, cacheKey, cacheTime = 10 * 60 * 1000) => {
+  // GET请求优先使用缓存
+  if (options.method === 'GET' || !options.method) {
+    const cached = uni.getStorageSync('trail_run_' + cacheKey)
+    if (cached) {
+      try {
+        const data = JSON.parse(cached)
+        if (data.expire > Date.now()) {
+          return data.value
+        }
+      } catch (e) {}
+    }
+  }
+
+  const result = await request(options)
+
+  // 缓存结果
+  if (options.method === 'GET' || !options.method) {
+    const cacheData = {
+      value: result,
+      expire: Date.now() + cacheTime
+    }
+    uni.setStorageSync('trail_run_' + cacheKey, JSON.stringify(cacheData))
+  }
+
+  return result
+}
+
 export const api = {
   // Auth
   register: (data) => request({ url: '/auth/register', method: 'POST', data }),

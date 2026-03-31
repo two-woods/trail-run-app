@@ -30,6 +30,12 @@
       "style": {
         "navigationBarTitleText": "我的比赛"
       }
+    },
+    {
+      "path": "pages/result-detail/result-detail",
+      "style": {
+        "navigationBarTitleText": "比赛详情"
+      }
     }
   ],
   "globalStyle": {

@@ -14,7 +14,7 @@
 ```
 Uni-app Client (uni.request)
     ↓ HTTPS
-Go Backend (Gorilla Mux)
+Go Backend (Gin)
     ├── JWT Authentication
     └── RESTful Endpoints /api/v1/*
 ```

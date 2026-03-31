@@ -27,7 +27,7 @@ WORKDIR /root/
 COPY --from=builder /server .
 
 # Expose port
-EXPOSE 8080
+EXPOSE 8081
 
 # Run
 CMD ["./server"]
