@@ -33,6 +33,14 @@
 - 401响应自动跳转登录页
 - 用户输入必须验证
 
+### VI. 模拟数据优先 (NON-NEGOTIABLE)
+所有模块必须提供模拟数据进行开发和测试：
+- 每个列表类接口必须支持分页返回模拟数据
+- 每个详情类接口必须返回完整的模拟数据对象
+- 模拟数据必须包含所有字段的典型值（不能只是占位符）
+- 模拟数据文件名规范：使用 `mock_` 前缀，如 `mock_races.json`
+- 模拟数据存放位置：后端 `/internal/testdata/` 或前端 `/src/testdata/`
+
 ## 技术栈约束
 
 ### 技术选型
@@ -66,4 +74,30 @@
 - 重大变更需要迁移计划
 - 所有PR必须验证合规性
 
-**Version**: 1.1.0 | **Ratified**: 2026-03-30 | **Last Amended**: 2026-04-01
+**Version**: 1.2.0 | **Ratified**: 2026-03-30 | **Last Amended**: 2026-04-01
+
+## Sync Impact Report
+
+### Version Change
+- Old: 1.1.0
+- New: 1.2.0 (MINOR bump - 新增模拟数据原则)
+
+### Modified Principles
+- None (new principle added)
+
+### Added Sections
+- VI. 模拟数据优先 (NON-NEGOTIABLE) - 所有模块必须提供模拟数据
+
+### Templates Requiring Updates
+- ⚠ pending: `.specify/templates/plan-template.md` - 检查Constitution Check是否需要更新
+- ⚠ pending: `.specify/templates/tasks-template.md` - 检查任务分类是否需要更新
+
+### Follow-up TODOs
+- 为现有模块补充mock数据文件
+- 在tasks.md中添加模拟数据相关任务（如有）
+
+### Rationale
+用户明确要求"所有模块都需要有模拟数据,比如列表展示"。这确保：
+1. 前端开发可以在后端API未完成时独立进行
+2. 测试可以在没有真实数据库的情况下运行
+3. Demo和演示可以脱离实际环境运行
