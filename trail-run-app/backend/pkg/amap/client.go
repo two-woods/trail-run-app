@@ -229,3 +229,57 @@ func (c *Client) ConvertAddress(address string) (lat, lng float64, err error) {
 	fmt.Sscanf(result.Geocodes[0].Location, "%f,%f", &l1, &l2)
 	return l2, l1, nil // 返回 lat, lng
 }
+
+// HotelSearchResponse 高德酒店搜索响应
+type HotelSearchResponse struct {
+	Status   string `json:"status"`
+	Info     string `json:"info"`
+	PoiCount string `json:"count"`
+	POIs     []HotelPOI `json:"pois"`
+}
+
+type HotelPOI struct {
+	Name     string `json:"name"`
+	Location string `json:"location"`
+	Distance string `json:"distance"`
+	Type     string `json:"type"`
+	Business string `json:"business"`
+	CityName string `json:"cityname"`
+	Address  string `json:"address"`
+	Tel      string `json:"tel"`
+}
+
+// SearchHotels 搜索附近酒店
+func (c *Client) SearchHotels(lat, lng float64, radius int) ([]HotelPOI, error) {
+	apiURL := "https://restapi.amap.com/v3/place/around"
+
+	params := url.Values{}
+	params.Set("key", c.apiKey)
+	params.Set("location", fmt.Sprintf("%f,%f", lng, lat))
+	params.Set("keywords", "酒店")
+	params.Set("types", "200300") // 酒店类型码
+	params.Set("radius", fmt.Sprintf("%d", radius))
+	params.Set("offset", "20")
+
+	resp, err := c.client.Get(apiURL + "?" + params.Encode())
+	if err != nil {
+		return nil, fmt.Errorf("failed to search hotels: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response: %w", err)
+	}
+
+	var result HotelSearchResponse
+	if err := json.Unmarshal(body, &result); err != nil {
+		return nil, fmt.Errorf("failed to parse response: %w", err)
+	}
+
+	if result.Status != "1" {
+		return nil, fmt.Errorf("API error: %s", result.Info)
+	}
+
+	return result.POIs, nil
+}

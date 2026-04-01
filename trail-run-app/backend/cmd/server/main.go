@@ -74,6 +74,13 @@ func main() {
 			protected.POST("/results", handler.CreateResult)
 			protected.GET("/results/:id", handler.GetResult)
 			protected.POST("/results/:id/image", handler.GenerateImage)
+
+			// Hotel routes (for race day planning)
+			protected.GET("/hotels/search", handler.SearchHotels)
+			protected.GET("/hotels/favorites", handler.ListFavoriteHotels)
+			protected.POST("/hotels/favorites", handler.CreateFavoriteHotel)
+			protected.DELETE("/hotels/favorites/:id", handler.DeleteFavoriteHotel)
+			protected.GET("/races/:id/hotels", handler.GetAllHotelsForRace)
 		}
 	}
 

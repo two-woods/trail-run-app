@@ -54,6 +54,8 @@ func AutoMigrate() error {
 		&Result{},
 		&EquipmentCheck{},
 		&FavoriteRace{},
+		&Hotel{},
+		&FavoriteHotel{},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to auto migrate: %w", err)
