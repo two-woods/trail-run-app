@@ -6,6 +6,9 @@ WORKDIR /app
 # Install dependencies
 RUN apk add --no-cache git
 
+# Set Go proxy for China region (resolves network timeout issues)
+ENV GOPROXY=https://goproxy.cn,https://proxy.golang.org,direct
+
 # Copy go mod files
 COPY go.mod go.sum ./
 RUN go mod download
