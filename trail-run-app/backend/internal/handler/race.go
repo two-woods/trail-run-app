@@ -82,7 +82,7 @@ func GetRace(c *gin.Context) {
 	}
 
 	var race model.Race
-	if err := model.DB.Preload("AidStations").Preload("Equipment").First(&race, "id = ?", id).Error; err != nil {
+	if err := model.DB.Preload("AidStations").First(&race, "id = ?", id).Error; err != nil {
 		utils.RespondNotFound(c, "Race not found")
 		return
 	}
