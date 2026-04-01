@@ -1,0 +1,156 @@
+{
+  "api_hotels": [
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440001",
+      "name": "崇礼云顶滑雪场酒店",
+      "lat": 40.9123,
+      "lng": 115.2856,
+      "distance_from_start": 800,
+      "address": "河北省张家口市崇礼区云顶滑雪场",
+      "phone": "0313-4778888",
+      "business_area": "云顶滑雪场",
+      "city_name": "张家口市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440002",
+      "name": "崇礼太舞滑雪度假酒店",
+      "lat": 40.9056,
+      "lng": 115.2789,
+      "distance_from_start": 1200,
+      "address": "河北省张家口市崇礼区太舞滑雪小镇",
+      "phone": "0313-4779999",
+      "business_area": "太舞滑雪小镇",
+      "city_name": "张家口市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440003",
+      "name": "临海华侨大酒店",
+      "lat": 28.8545,
+      "lng": 120.9287,
+      "distance_from_start": 3500,
+      "address": "浙江省临海市古城街道鹿城路288号",
+      "phone": "0576-85318888",
+      "business_area": "临海市中心",
+      "city_name": "临海市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440004",
+      "name": "括苍山国家森林公园招待所",
+      "lat": 28.8623,
+      "lng": 120.9356,
+      "distance_from_start": 500,
+      "address": "浙江省临海市括苍镇括苍山国家森林公园内",
+      "phone": "0576-85881588",
+      "business_area": "括苍山景区",
+      "city_name": "临海市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440005",
+      "name": "北京门头沟希尔顿酒店",
+      "lat": 39.9898,
+      "lng": 115.4212,
+      "distance_from_start": 4500,
+      "address": "北京市门头沟区三家店路99号",
+      "phone": "010-69838888",
+      "business_area": "门头沟城区",
+      "city_name": "北京市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440006",
+      "name": "杭州西湖希尔顿酒店",
+      "lat": 30.2489,
+      "lng": 120.1523,
+      "distance_from_start": 2800,
+      "address": "浙江省杭州市西湖区曙光路127号",
+      "phone": "0571-87998899",
+      "business_area": "西湖风景区",
+      "city_name": "杭州市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440007",
+      "name": "南京金陵滨江希尔顿酒店",
+      "lat": 32.0923,
+      "lng": 118.6312,
+      "distance_from_start": 5500,
+      "address": "江苏省南京市浦口区天浦路28号",
+      "phone": "025-58699888",
+      "business_area": "江北新区",
+      "city_name": "南京市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440008",
+      "name": "深圳东部华侨城茵特拉根酒店",
+      "lat": 22.5912,
+      "lng": 114.2389,
+      "distance_from_start": 6200,
+      "address": "广东省深圳市盐田区大梅沙东部华侨城",
+      "phone": "0755-25288888",
+      "business_area": "东部华侨城",
+      "city_name": "深圳市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440009",
+      "name": "成都龙泉山星空帐篷酒店",
+      "lat": 30.5545,
+      "lng": 104.2956,
+      "distance_from_start": 1200,
+      "address": "四川省成都市龙泉驿区山泉镇龙泉山城市森林公园",
+      "phone": "028-84898888",
+      "business_area": "龙泉山景区",
+      "city_name": "成都市",
+      "source": "api"
+    },
+    {
+      "id": "h550e8400-e29b-41d4-a716-446655440010",
+      "name": "大理古城希尔顿酒店",
+      "lat": 25.6023,
+      "lng": 100.2656,
+      "distance_from_start": 4000,
+      "address": "云南省大理白族自治州大理市中和路9号",
+      "phone": "0872-2688888",
+      "business_area": "大理古城",
+      "city_name": "大理市",
+      "source": "api"
+    }
+  ],
+  "favorite_hotels": [
+    {
+      "id": "f550e8400-e29b-41d4-a716-446655440001",
+      "user_id": "u550e8400-e29b-41d4-a716-446655440001",
+      "race_id": "550e8400-e29b-41d4-a716-446655440001",
+      "name": "崇礼密苑云顶酒店",
+      "lat": 40.9089,
+      "lng": 115.2823,
+      "distance": 600,
+      "address": "河北省张家口市崇礼区四台嘴乡密苑云顶滑雪场",
+      "phone": "0313-4776789",
+      "booking_url": "https://www.myyunduan.com",
+      "notes": "赛道起点附近，步行可达",
+      "source": "favorite"
+    },
+    {
+      "id": "f550e8400-e29b-41d4-a716-446655440002",
+      "user_id": "u550e8400-e29b-41d4-a716-446655440001",
+      "race_id": "550e8400-e29b-41d4-a716-446655440002",
+      "name": "临海远洲国际大酒店",
+      "lat": 28.8567,
+      "lng": 120.9301,
+      "distance": 2800,
+      "address": "浙江省临海市大洋街道钱王路18号",
+      "phone": "0576-85678888",
+      "booking_url": "https://www.yuanzhouhotels.com",
+      "notes": "含早餐，提前预约可延迟退房",
+      "source": "favorite"
+    }
+  ],
+  "total_api": 10,
+  "total_favorite": 2
+}

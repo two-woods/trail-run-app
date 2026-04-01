@@ -210,6 +210,7 @@ Phase 8 (收尾)
 | T020 | Uni-app 端：赛事列表页和赛事详情页 | P1 | Phase 4赛事前端 |
 | T055 | Uni-app 端：酒店列表展示和预订链接 | P2 | Phase 5住宿模块前端 |
 | T047 | OSS上传集成 | P2 | 图片生成后上传 |
+| T056 | Mock数据生成（races/hotels/results） | P1 | 宪法VI.模拟数据优先要求 |
 
 ---
 
