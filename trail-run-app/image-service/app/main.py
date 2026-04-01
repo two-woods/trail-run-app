@@ -5,8 +5,10 @@ from typing import Optional
 import base64
 import io
 import math
+import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import matplotlib.pyplot as plt
@@ -15,6 +17,17 @@ from matplotlib.patches import FancyBboxPatch
 import numpy as np
 
 app = FastAPI(title="Trail Run Image Service")
+
+# OSS Configuration
+OSS_ACCESS_KEY = os.getenv("OSS_ACCESS_KEY", "")
+OSS_SECRET_KEY = os.getenv("OSS_SECRET_KEY", "")
+OSS_BUCKET = os.getenv("OSS_BUCKET", "trail-run")
+OSS_ENDPOINT = os.getenv("OSS_ENDPOINT", "oss-cn-hangzhou.aliyuncs.com")
+OSS_ENABLED = bool(OSS_ACCESS_KEY and OSS_SECRET_KEY)
+
+# Local storage path for fallback
+LOCAL_STORAGE_PATH = os.getenv("LOCAL_STORAGE_PATH", "/tmp/trail-run-images")
+Path(LOCAL_STORAGE_PATH).mkdir(parents=True, exist_ok=True)
 
 
 class ImageGenerationRequest(BaseModel):
@@ -335,13 +348,37 @@ async def generate_image_endpoint(req: ImageGenerationRequest):
     - Race name and date
     - Trail map with GPX track
     - Key stats (distance, elevation, finish time)
+
+    Image is uploaded to OSS if configured, otherwise saved locally.
     """
     try:
         image_bytes = await generate_image(req)
+
+        # Generate unique filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"race_{req.race_name}_{timestamp}.jpg"
+        # Sanitize filename
+        filename = "".join(c for c in filename if c.isalnum() or c in "._-")
+
+        image_url = ""
+
+        # Upload to OSS if configured
+        if OSS_ENABLED:
+            try:
+                image_url = upload_to_oss(image_bytes, filename)
+            except Exception as e:
+                # Fallback to local storage if OSS fails
+                print(f"OSS upload failed, using local storage: {e}")
+                image_url = save_locally(image_bytes, filename)
+        else:
+            # Use local storage
+            image_url = save_locally(image_bytes, filename)
+
+        # Return URL and base64 for immediate display
         image_b64 = base64.b64encode(image_bytes).decode('utf-8')
 
         return ImageServiceResponse(
-            image_url="",
+            image_url=image_url,
             image_data=image_b64
         )
     except Exception as e:
@@ -351,3 +388,35 @@ async def generate_image_endpoint(req: ImageGenerationRequest):
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+
+def upload_to_oss(image_bytes: bytes, filename: str) -> str:
+    """
+    Upload image to Alibaba Cloud OSS.
+    Returns the public URL of the uploaded image.
+    """
+    import oss2
+
+    auth = oss2.Auth(OSS_ACCESS_KEY, OSS_SECRET_KEY)
+    bucket = oss2.Bucket(auth, OSS_ENDPOINT, OSS_BUCKET)
+
+    # Generate unique object key
+    object_key = f"race-images/{filename}"
+
+    # Upload the image
+    bucket.put_object(object_key, image_bytes)
+
+    # Return public URL
+    return f"https://{OSS_BUCKET}.{OSS_ENDPOINT}/{object_key}"
+
+
+def save_locally(image_bytes: bytes, filename: str) -> str:
+    """
+    Save image locally as fallback when OSS is not configured.
+    Returns the local path URL.
+    """
+    local_path = Path(LOCAL_STORAGE_PATH) / filename
+    local_path.write_bytes(image_bytes)
+
+    # Return relative URL that nginx can serve
+    return f"/images/{filename}"

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -195,7 +196,11 @@ func GenerateImage(c *gin.Context) {
 	}
 
 	// Call Python image service
-	imageServiceURL := "http://localhost:8082/generate"
+	imageServiceURL := os.Getenv("IMAGE_SERVICE_URL")
+	if imageServiceURL == "" {
+		imageServiceURL = "http://localhost:8082"
+	}
+	imageServiceURL += "/generate"
 
 	payload := map[string]interface{}{
 		"race_name":   req.RaceName,
@@ -221,6 +226,13 @@ func GenerateImage(c *gin.Context) {
 	if err := json.NewDecoder(resp.Body).Decode(&imgResp); err != nil {
 		utils.RespondInternalError(c, "Failed to parse image response")
 		return
+	}
+
+	// Save the image URL to the result
+	result.GeneratedImageURL = &imgResp.ImageURL
+	if err := model.DB.Save(&result).Error; err != nil {
+		utils.LogWarn("Failed to save image URL to result: %v", err)
+		// Continue anyway - image was generated successfully
 	}
 
 	utils.RespondSuccess(c, gin.H{

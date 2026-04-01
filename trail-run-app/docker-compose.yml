@@ -36,6 +36,10 @@ services:
     container_name: trail-run-image-service
     ports:
       - "8082:5000"
+    volumes:
+      - ./image-storage:/tmp/trail-run-images
+    environment:
+      - LOCAL_STORAGE_PATH=/tmp/trail-run-images
     networks:
       - trail-run-network
 
