@@ -41,6 +41,15 @@
 - 模拟数据文件名规范：使用 `mock_` 前缀，如 `mock_races.json`
 - 模拟数据存放位置：后端 `/internal/testdata/` 或前端 `/src/testdata/`
 
+### VII. Web Testing (NON-NEGOTIABLE)
+每次功能改动必须使用Playwright进行页面测试验证：
+- 使用Playwright MCP工具进行自动化Web测试
+- 测试覆盖：页面加载、关键元素存在、数据展示正确
+- 登录流程测试：注册→登录→Token存储→登出
+- 列表页测试：数据加载、分页、筛选
+- 详情页测试：数据完整展示、导航跳转
+- 提交前必须完成Web测试，测试报告随commit记录
+
 ## 技术栈约束
 
 ### 技术选型
@@ -49,6 +58,7 @@
 - 图片服务：Python FastAPI + Pillow + cairosvg
 - 地图：高德地图API
 - 对象存储：阿里云OSS
+- 测试：Playwright (Web Testing)
 
 ### 部署要求
 - Nginx作为反向代理和静态资源服务
@@ -66,6 +76,7 @@
 - 核心功能需要测试覆盖
 - 集成测试验证API端点
 - E2E测试关键用户流程
+- Web Testing：每次功能改动必须使用Playwright测试
 
 ## Governance
 
@@ -74,30 +85,30 @@
 - 重大变更需要迁移计划
 - 所有PR必须验证合规性
 
-**Version**: 1.2.0 | **Ratified**: 2026-03-30 | **Last Amended**: 2026-04-01
+**Version**: 1.3.0 | **Ratified**: 2026-03-30 | **Last Amended**: 2026-04-01
 
 ## Sync Impact Report
 
 ### Version Change
-- Old: 1.1.0
-- New: 1.2.0 (MINOR bump - 新增模拟数据原则)
+- Old: 1.2.0
+- New: 1.3.0 (MINOR bump - 新增Web Testing原则)
 
 ### Modified Principles
 - None (new principle added)
 
 ### Added Sections
-- VI. 模拟数据优先 (NON-NEGOTIABLE) - 所有模块必须提供模拟数据
+- VII. Web Testing (NON-NEGOTIABLE) - Playwright自动化测试要求
 
 ### Templates Requiring Updates
 - ⚠ pending: `.specify/templates/plan-template.md` - 检查Constitution Check是否需要更新
 - ⚠ pending: `.specify/templates/tasks-template.md` - 检查任务分类是否需要更新
 
 ### Follow-up TODOs
-- 为现有模块补充mock数据文件
-- 在tasks.md中添加模拟数据相关任务（如有）
+- 配置Playwright测试环境
+- 编写核心页面的Playwright测试用例
 
 ### Rationale
-用户明确要求"所有模块都需要有模拟数据,比如列表展示"。这确保：
-1. 前端开发可以在后端API未完成时独立进行
-2. 测试可以在没有真实数据库的情况下运行
-3. Demo和演示可以脱离实际环境运行
+用户明确要求"每次改动功能,都要使用web testing,凭借playwright来测试下页面"。这确保：
+1. 功能改动后立即验证页面行为正确
+2. 捕获回归问题在早期阶段
+3. 提供可视化的测试报告记录
