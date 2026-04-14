@@ -86,6 +86,7 @@ async function handleSubmit() {
       })
     }
 
+    // 保存token
     uni.setStorageSync('token', res.token)
     uni.setStorageSync('user', {
       id: res.user_id,
@@ -98,6 +99,7 @@ async function handleSubmit() {
       icon: 'success'
     })
 
+    // 跳转到首页
     setTimeout(() => {
       uni.reLaunch({ url: '/pages/index/index' })
     }, 1500)

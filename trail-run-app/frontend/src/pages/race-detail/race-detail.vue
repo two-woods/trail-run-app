@@ -112,6 +112,7 @@ const markers = computed(() => {
 
   const result = []
 
+  // Start marker
   result.push({
     id: 0,
     latitude: race.value.start_lat,
@@ -129,6 +130,7 @@ const markers = computed(() => {
     }
   })
 
+  // Aid station markers
   race.value.aid_stations.forEach((aid, index) => {
     result.push({
       id: index + 1,
@@ -152,6 +154,7 @@ const markers = computed(() => {
 })
 
 const polyline = computed(() => {
+  // TODO: Parse GPX and draw route
   return []
 })
 
@@ -161,6 +164,7 @@ async function loadRaceDetail(id) {
     const res = await api.getRace(id)
     race.value = res.data
 
+    // Load equipment
     const eqRes = await api.getEquipment(id)
     equipment.value = eqRes.data
   } catch (e) {

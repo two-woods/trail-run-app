@@ -1,21 +1,18 @@
 <template>
   <view class="container">
-    <view v-if="loading" class="loading">加载中...</view>
-    <view v-else-if="error" class="error">{{ error }}</view>
-    <view v-else-if="race" class="race-content">
     <!-- 比赛信息头部 -->
     <view class="race-header">
       <view class="race-info">
-        <text class="race-name">{{ race.name || '未知赛事' }}</text>
-        <text class="race-date">{{ race.date ? formatDate(race.date) : '' }}</text>
+        <text class="race-name">{{ race.name }}</text>
+        <text class="race-date">{{ formatDate(race.date) }}</text>
       </view>
       <view class="race-stats">
         <view class="stat">
-          <text class="stat-value">{{ race.distance_km || 0 }}</text>
+          <text class="stat-value">{{ race.distance_km }}</text>
           <text class="stat-label">公里</text>
         </view>
         <view class="stat">
-          <text class="stat-value">{{ race.elevation_m || 0 }}</text>
+          <text class="stat-value">{{ race.elevation_m }}</text>
           <text class="stat-label">爬升</text>
         </view>
       </view>
@@ -156,86 +153,11 @@
         </view>
       </view>
     </view>
-
-    <!-- 住宿酒店 -->
-    <view class="section">
-      <text class="section-title">🏨 附近酒店</text>
-
-      <!-- API酒店列表 -->
-      <view class="hotel-list" v-if="hotels.apiHotels?.length > 0">
-        <view
-          v-for="hotel in hotels.apiHotels"
-          :key="hotel.id"
-          class="hotel-card"
-          @click="openHotelBooking(hotel)"
-        >
-          <view class="hotel-info">
-            <text class="hotel-name">{{ hotel.name }}</text>
-            <view class="hotel-details">
-              <text class="hotel-distance" v-if="hotel.distance_from_start">距起点 {{ hotel.distance_from_start }}m</text>
-              <text class="hotel-address">{{ hotel.address }}</text>
-            </view>
-          </view>
-          <view class="hotel-action">
-            <text class="hotel-book" v-if="hotel.phone">📞 {{ hotel.phone }}</text>
-            <text class="hotel-arrow">›</text>
-          </view>
-        </view>
-      </view>
-
-      <!-- 收藏酒店列表 -->
-      <view class="favorite-hotels" v-if="hotels.favoriteHotels?.length > 0">
-        <text class="subsection-title">⭐ 我的收藏</text>
-        <view
-          v-for="hotel in hotels.favoriteHotels"
-          :key="hotel.id"
-          class="hotel-card favorite"
-        >
-          <view class="hotel-info">
-            <text class="hotel-name">{{ hotel.name }}</text>
-            <view class="hotel-details">
-              <text class="hotel-distance" v-if="hotel.distance_from_start">距起点 {{ hotel.distance_from_start }}m</text>
-              <text class="hotel-address">{{ hotel.address }}</text>
-            </view>
-          </view>
-          <view class="hotel-actions">
-            <text class="hotel-book" v-if="hotel.booking_url" @click="openBookingUrl(hotel.booking_url)">预订</text>
-            <text class="hotel-delete" @click="removeFavoriteHotel(hotel.id)">删除</text>
-          </view>
-        </view>
-      </view>
-
-      <!-- 空状态 -->
-      <view class="empty-state" v-if="!hotels.apiHotels?.length && !hotels.favoriteHotels?.length">
-        <text class="empty-text">暂无可用酒店信息</text>
-      </view>
-
-      <!-- 添加收藏酒店 -->
-      <button class="btn-add-hotel" @click="showAddHotelModal = true">+ 添加收藏酒店</button>
-    </view>
-    </view>
-  </view>
-
-  <!-- 添加收藏酒店弹窗 -->
-  <view class="modal" v-if="showAddHotelModal" @click="showAddHotelModal = false">
-    <view class="modal-content" @click.stop>
-      <text class="modal-title">添加收藏酒店</text>
-      <input class="modal-input" v-model="newHotel.name" placeholder="酒店名称" />
-      <input class="modal-input" v-model="newHotel.address" placeholder="地址" />
-      <input class="modal-input" v-model="newHotel.phone" placeholder="电话" />
-      <input class="modal-input" v-model="newHotel.booking_url" placeholder="预订链接" />
-      <input class="modal-input" v-model="newHotel.distance" type="number" placeholder="距起点距离(m)" />
-      <view class="modal-actions">
-        <button @click="showAddHotelModal = false">取消</button>
-        <button type="primary" @click="addFavoriteHotel">保存</button>
-      </view>
-    </view>
   </view>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { ref, onLoad } from '@dcloudio/uni-app'
 import { api } from '@/services/api'
 
 const race = ref(null)
@@ -244,60 +166,31 @@ const commute = ref({ start_point: {}, parking: [] })
 const aidStations = ref([])
 const equipment = ref({ mandatory: [], recommended: [] })
 const recommendations = ref([])
-const hotels = ref({ apiHotels: [], favoriteHotels: [] })
-const loading = ref(false)
-const error = ref('')
-const showAddHotelModal = ref(false)
-const newHotel = ref({
-  name: '',
-  address: '',
-  phone: '',
-  booking_url: '',
-  distance: 0
-})
-
-const missingMandatory = computed(() => {
-  if (!equipment.value.mandatory) return []
-  return equipment.value.mandatory.filter(eq => !eq.checked)
-})
 
 onLoad((query) => {
   if (query.id) {
     loadRacePlan(query.id)
-  } else {
-    error.value = '缺少赛事ID'
   }
 })
 
 async function loadRacePlan(id) {
-  loading.value = true
-  error.value = ''
   try {
-    const [planRes, eqRes, hotelRes] = await Promise.all([
+    const [planRes, eqRes] = await Promise.all([
       api.getRacePlan(id),
-      api.getEquipment(id),
-      api.getHotels(id)
+      api.getEquipment(id)
     ])
 
-    race.value = planRes.data?.race || null
-    weather.value = planRes.data?.weather || null
-    commute.value = planRes.data?.commute || { start_point: {}, parking: [] }
-    aidStations.value = planRes.data?.aid_stations || []
-    equipment.value = eqRes.data || { mandatory: [], recommended: [] }
-    hotels.value = {
-      apiHotels: hotelRes.data?.api_hotels || [],
-      favoriteHotels: hotelRes.data?.favorite_hotels || []
-    }
+    race.value = planRes.data.race
+    weather.value = planRes.data.weather
+    commute.value = planRes.data.commute
+    aidStations.value = planRes.data.aid_stations || []
+    equipment.value = eqRes.data
   } catch (e) {
-    error.value = '加载失败，请重试'
-    console.error('loadRacePlan error:', e)
-  } finally {
-    loading.value = false
+    uni.showToast({ title: '加载失败', icon: 'none' })
   }
 }
 
 function formatDate(date) {
-  if (!date) return ''
   const d = new Date(date)
   return `${d.getMonth() + 1}月${d.getDate()}日`
 }
@@ -356,66 +249,6 @@ function addRecommended(rec) {
   // Add recommended equipment to user's list
   uni.showToast({ title: '添加成功', icon: 'success' })
 }
-
-function openHotelBooking(hotel) {
-  if (hotel.phone) {
-    uni.makePhoneCall({
-      phoneNumber: hotel.phone
-    })
-  }
-  if (hotel.lat && hotel.lng) {
-    uni.openLocation({
-      latitude: hotel.lat,
-      longitude: hotel.lng,
-      name: hotel.name,
-      address: hotel.address
-    })
-  }
-}
-
-function openBookingUrl(url) {
-  if (url) {
-    plus.runtime.openURL(url)
-  }
-}
-
-async function addFavoriteHotel() {
-  if (!newHotel.value.name) {
-    uni.showToast({ title: '请输入酒店名称', icon: 'none' })
-    return
-  }
-  try {
-    await api.createFavoriteHotel({
-      race_id: race.value.id,
-      name: newHotel.value.name,
-      lat: race.value.start_lat || 0,
-      lng: race.value.start_lng || 0,
-      address: newHotel.value.address,
-      phone: newHotel.value.phone,
-      booking_url: newHotel.value.booking_url,
-      distance: parseInt(newHotel.value.distance) || 0
-    })
-    uni.showToast({ title: '添加成功', icon: 'success' })
-    showAddHotelModal.value = false
-    // Reload hotels
-    const hotelRes = await api.getHotels(race.value.id)
-    hotels.value.favoriteHotels = hotelRes.data?.favorite_hotels || []
-    // Reset form
-    newHotel.value = { name: '', address: '', phone: '', booking_url: '', distance: 0 }
-  } catch (e) {
-    uni.showToast({ title: '添加失败', icon: 'none' })
-  }
-}
-
-async function removeFavoriteHotel(id) {
-  try {
-    await api.deleteFavoriteHotel(id)
-    uni.showToast({ title: '删除成功', icon: 'success' })
-    hotels.value.favoriteHotels = hotels.value.favoriteHotels.filter(h => h.id !== id)
-  } catch (e) {
-    uni.showToast({ title: '删除失败', icon: 'none' })
-  }
-}
 </script>
 
 <style scoped>
@@ -423,16 +256,6 @@ async function removeFavoriteHotel(id) {
   min-height: 100vh;
   background: #f5f5f5;
   padding: 24rpx;
-}
-
-.loading, .error {
-  text-align: center;
-  padding: 100rpx;
-  color: #666;
-}
-
-.error {
-  color: #f44336;
 }
 
 .race-header {
@@ -749,170 +572,5 @@ async function removeFavoriteHotel(id) {
   border-radius: 8rpx;
   font-size: 24rpx;
   border: none;
-}
-
-.hotel-list {
-  margin-bottom: 16rpx;
-}
-
-.subsection-title {
-  display: block;
-  font-size: 26rpx;
-  color: #666;
-  margin: 16rpx 0 12rpx;
-}
-
-.hotel-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16rpx;
-  background: #f8f9fa;
-  border-radius: 12rpx;
-  margin-bottom: 8rpx;
-}
-
-.hotel-card.favorite {
-  background: #fff8e1;
-}
-
-.hotel-info {
-  flex: 1;
-}
-
-.hotel-name {
-  display: block;
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 4rpx;
-}
-
-.hotel-details {
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-}
-
-.hotel-distance {
-  font-size: 22rpx;
-  color: #667eea;
-}
-
-.hotel-address {
-  font-size: 22rpx;
-  color: #999;
-}
-
-.hotel-action {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.hotel-actions {
-  display: flex;
-  gap: 16rpx;
-}
-
-.hotel-book {
-  font-size: 24rpx;
-  color: #667eea;
-  padding: 8rpx 16rpx;
-  background: #eee;
-  border-radius: 6rpx;
-}
-
-.hotel-delete {
-  font-size: 24rpx;
-  color: #f44336;
-  padding: 8rpx 16rpx;
-  background: #ffebee;
-  border-radius: 6rpx;
-}
-
-.hotel-arrow {
-  font-size: 32rpx;
-  color: #999;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 32rpx;
-  color: #999;
-}
-
-.empty-text {
-  font-size: 26rpx;
-}
-
-.btn-add-hotel {
-  width: 100%;
-  padding: 16rpx;
-  background: #fff;
-  border: 2rpx dashed #667eea;
-  border-radius: 12rpx;
-  color: #667eea;
-  font-size: 28rpx;
-  margin-top: 16rpx;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  width: 600rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 32rpx;
-}
-
-.modal-title {
-  display: block;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 24rpx;
-  text-align: center;
-}
-
-.modal-input {
-  width: 100%;
-  padding: 16rpx;
-  border: 1rpx solid #ddd;
-  border-radius: 8rpx;
-  font-size: 28rpx;
-  margin-bottom: 16rpx;
-  box-sizing: border-box;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 16rpx;
-  justify-content: flex-end;
-}
-
-.modal-actions button {
-  padding: 12rpx 32rpx;
-  border-radius: 8rpx;
-  font-size: 28rpx;
-  border: none;
-  background: #eee;
-  color: #666;
-}
-
-.modal-actions button[type="primary"] {
-  background: #667eea;
-  color: #fff;
 }
 </style>

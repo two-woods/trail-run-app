@@ -154,7 +154,8 @@ const stats = ref(null)
 const loading = ref(true)
 const generating = ref(false)
 
-const mapCenter = ref({ lat: 30.5728, lng: 114.2525 })
+// Map data
+const mapCenter = ref({ lat: 30.5728, lng: 114.2525 }) // Default: Wuhan
 const mapScale = ref(12)
 const polyline = ref([])
 const markers = ref([])
@@ -175,6 +176,7 @@ async function loadResult(id) {
       stats.value = res.data.stats
     }
 
+    // Setup map if GeoJSON available
     if (res.data.geojson) {
       setupMap(res.data.geojson, res.data.race)
     }
@@ -189,6 +191,7 @@ async function loadResult(id) {
 function setupMap(geojson, race) {
   const features = geojson.features || []
 
+  // Process LineString track
   const trackFeature = features.find(f =>
     f.geometry?.type === 'LineString' && !f.properties?.marker
   )
@@ -204,6 +207,7 @@ function setupMap(geojson, race) {
       dottedLine: false
     }]
 
+    // Fit map to track bounds
     if (points.length > 0) {
       const lats = points.map(p => p.latitude)
       const lngs = points.map(p => p.longitude)
@@ -217,6 +221,7 @@ function setupMap(geojson, race) {
         lng: (minLng + maxLng) / 2
       }
 
+      // Calculate scale based on bounds
       const latDiff = maxLat - minLat
       const lngDiff = maxLng - minLng
       const maxDiff = Math.max(latDiff, lngDiff)
@@ -227,6 +232,7 @@ function setupMap(geojson, race) {
     }
   }
 
+  // Process markers (start/end points)
   const startFeature = features.find(f => f.properties?.marker === 'start')
   const endFeature = features.find(f => f.properties?.marker === 'end')
 
@@ -254,6 +260,7 @@ function setupMap(geojson, race) {
     })
   }
 
+  // Add aid station markers if available from race
   if (race?.aid_stations?.length) {
     race.aid_stations.forEach((station, idx) => {
       if (station.latitude && station.longitude) {
@@ -340,6 +347,7 @@ async function generateCertificate() {
     generating.value = true
     const race = result.value.race
 
+    // Fetch GPX data if we have a GPX URL
     let gpxData = ''
     if (result.value.gpx_url) {
       try {
@@ -375,6 +383,7 @@ async function generateCertificate() {
 }
 
 function base64Encode(str) {
+  // Simple base64 encoding for Latin-1 strings
   return btoa(unescape(encodeURIComponent(str)))
 }
 
@@ -382,6 +391,7 @@ async function saveImage() {
   if (!result.value?.generated_image_url) return
 
   try {
+    // For base64 data URLs, save directly
     const base64Data = result.value.generated_image_url.split(',')[1]
     const filePath = `${wx.env.USER_DATA_PATH}/certificate_${result.value.id}.jpg`
 
